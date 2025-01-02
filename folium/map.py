@@ -2,12 +2,17 @@
 Classes for drawing maps.
 
 """
+print("LOCAL FOLIUM IMPORTED")
 
 import warnings
 from collections import OrderedDict
 from typing import TYPE_CHECKING, Optional, Sequence, Union, cast
 
 from branca.element import Element, Figure, Html, MacroElement
+
+#
+#
+#
 
 from folium.elements import ElementAddToElement, EventHandler
 from folium.template import Template
@@ -21,6 +26,10 @@ from folium.utilities import (
     remove_empty,
     validate_location,
 )
+
+#additional imports added for cloneIcon
+from binascii import hexlify
+from os import urandom
 
 if TYPE_CHECKING:
     from folium.features import CustomIcon, DivIcon
@@ -325,6 +334,15 @@ class Icon(MacroElement):
             extra_classes=f"fa-rotate-{angle}",
             **kwargs,
         )
+    
+#adding a function that can create a new copy of an icon/DivIcon/CustomIcon all of which extend MacroElement
+#since the map needs to have a unique parent/child relationship with each icon
+#reusing a single icon does not work
+#It would be more elegant to put this in Branca
+def cloneIcon(Icon_to_clone):
+    clone = copy.copy(Icon_to_clone)
+    clone._id = hexlify(urandom(16)).decode()
+    return clone
 
 
 class Marker(MacroElement):
@@ -388,6 +406,11 @@ class Marker(MacroElement):
             draggable=draggable or None, autoPan=draggable or None, **kwargs
         )
         if icon is not None:
+            #each icon needs to have a unique parent child relationship with the map
+            #we ensure that repeated calls with the same icon yield valid results by cloning it
+            #add child will overwrite any existing parent field value, so there's no need for us 
+            # to test or reset it here.
+            icon = cloneIcon(icon)
             self.add_child(icon)
             self.icon = icon
         if popup is not None:
