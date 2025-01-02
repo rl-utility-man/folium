@@ -2,17 +2,12 @@
 Classes for drawing maps.
 
 """
-print("LOCAL FOLIUM IMPORTED")
 
 import warnings
 from collections import OrderedDict
 from typing import TYPE_CHECKING, Optional, Sequence, Union, cast
 
 from branca.element import Element, Figure, Html, MacroElement
-
-#
-#
-#
 
 from folium.elements import ElementAddToElement, EventHandler
 from folium.template import Template
